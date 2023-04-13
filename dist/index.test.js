@@ -31,7 +31,7 @@ describe('jiraIntegration()', () => {
             key: ['ABC', 'DEF'],
             url: 'https://jira.net/browse',
         });
-        expect(global.warn).toHaveBeenCalledWith("No JIRA keys found in the PR title, branch name, or commit messages (e.g. ABC-123, DEF-123).");
+        expect(global.warn).toHaveBeenCalledWith('No JIRA keys found in the PR title, branch name, or commit messages (e.g. ABC-123, DEF-123).');
     });
     it('adds the JIRA issue link from PR title to the messages table', () => {
         global.danger = {

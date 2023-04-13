@@ -38,10 +38,8 @@ describe('jiraIntegration()', () => {
       url: 'https://jira.net/browse',
     })
     expect(global.warn).toHaveBeenCalledWith(
-      "No JIRA keys found in the PR title, branch name, or commit messages (e.g. ABC-123, DEF-123)."
+      'No JIRA keys found in the PR title, branch name, or commit messages (e.g. ABC-123, DEF-123).'
     )
-
-
   })
 
   it('adds the JIRA issue link from PR title to the messages table', () => {
@@ -52,9 +50,7 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
 
   it('properly concatenates URL parts (trailing slash in url)', () => {
@@ -65,9 +61,7 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse/',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('matches JIRA issue anywhere in title', () => {
     global.danger = { github: { pr: { title: 'My changes - ABC-123' } } }
@@ -75,32 +69,25 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-123">ABC-123</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-123">ABC-123</a>')
   })
   it('matches JIRA issue anywhere in title when no configuration key', () => {
     global.danger = { github: { pr: { title: 'My changes - ABC-123' } } }
     jiraIntegration({
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-123">ABC-123</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-123">ABC-123</a>')
   })
 
   it('matches lowercase JIRA key in the git branch', () => {
     global.danger = {
       github: { pr: { head: { ref: 'abc-808/some-things' } } },
-
     }
     jiraIntegration({
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('matches lowercase JIRA key in PR title', () => {
     global.danger = {
@@ -110,9 +97,7 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('does not match lowercase JIRA key in PR title when case-sensitive', () => {
     global.danger = {
@@ -172,9 +157,7 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('supports JIRA key in the git branch when no configuration key', () => {
     global.danger = {
@@ -183,9 +166,7 @@ describe('jiraIntegration()', () => {
     jiraIntegration({
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('supports JIRA key in the PR body', () => {
     global.danger = { github: { pr: { body: '[ABC-808] Change some things' } } }
@@ -194,9 +175,7 @@ describe('jiraIntegration()', () => {
       key: 'ABC',
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
   it('supports JIRA key in the PR body when no configuration key', () => {
     global.danger = { github: { pr: { body: '[ABC-808] Change some things' } } }
@@ -204,8 +183,6 @@ describe('jiraIntegration()', () => {
     jiraIntegration({
       url: 'https://jira.net/browse',
     })
-    expect(global.message).toHaveBeenCalledWith(
-      ':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>'
-    )
+    expect(global.message).toHaveBeenCalledWith(':link: <a href="https://jira.net/browse/ABC-808">ABC-808</a>')
   })
 })

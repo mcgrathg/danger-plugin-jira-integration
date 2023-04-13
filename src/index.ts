@@ -1,7 +1,7 @@
 import { resolve } from 'url'
 
 // Provides dev-time type structures for  `danger` - doesn't affect runtime.
-import {DangerDSLType} from "../node_modules/danger/distribution/dsl/DangerDSL"
+import { DangerDSLType } from '../node_modules/danger/distribution/dsl/DangerDSL'
 declare var danger: DangerDSLType
 export declare function message(message: string): void
 export declare function warn(message: string): void
@@ -34,7 +34,7 @@ export interface Options {
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
-export default function jiraIntegration({ key, url, format = defaultFormat, caseSensitive=false }: Options) {
+export default function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = false }: Options) {
   if (!url) {
     throw Error(`'url' missing - must supply JIRA installation URL`)
   }
@@ -65,23 +65,21 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
   if (allIssues.size > 0) {
     // URL must end with a slash before attempting to fully resolve the JIRA URL.
     url = ensureUrlEndsWithSlash(url)
-    const jiraUrls = Array.from(allIssues).map(issue => {
+    const jiraUrls = Array.from(allIssues).map((issue) => {
       const formattedIssue = issue.toUpperCase()
       const resolvedUrl = resolve(url, formattedIssue)
       return link(resolvedUrl, formattedIssue)
     })
     message(format(jiraUrls))
   } else {
-
-    let warningKeys;
+    let warningKeys
     if (key) {
-      warningKeys = Array.isArray(key) ? key.map(k => `${k}-123`).join(', ') : key + '-123';
+      warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123'
     } else {
-      warningKeys = 'ABC-123';
+      warningKeys = 'ABC-123'
     }
 
-
-    warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`);
+    warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`)
   }
 }
 

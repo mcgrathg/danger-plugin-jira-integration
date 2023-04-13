@@ -31,7 +31,9 @@
     "prettier": "prettier",
     "prettier-write": "npm run prettier -- --parser typescript --no-semi --trailing-comma es5 --write --print-width 120",
     "prettier-project": "npm run prettier-write -- 'src/**/*.{ts,tsx}'",
-    "lint": "tslint \"src/**/*.ts\""
+    "type-check": "tsc --pretty --noEmit",
+    "lint": "tslint \"src/**/*.ts\"",
+    "prepare": "husky install"
   },
   "license": "MIT",
   "engines": {
@@ -48,7 +50,7 @@
     "commitizen": "^2.9.6",
     "cz-conventional-changelog": "^2.0.0",
     "danger": "*",
-    "husky": "^8.0.3",
+    "husky": "^8.0.0",
     "jest": "^29.5.0",
     "lint-staged": "^13.2.1",
     "prettier": "^2.8.7",

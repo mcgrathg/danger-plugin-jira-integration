@@ -28,7 +28,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
     if (allIssues.size > 0) {
         // URL must end with a slash before attempting to fully resolve the JIRA URL.
         url = ensureUrlEndsWithSlash(url);
-        const jiraUrls = Array.from(allIssues).map(issue => {
+        const jiraUrls = Array.from(allIssues).map((issue) => {
             const formattedIssue = issue.toUpperCase();
             const resolvedUrl = (0, url_1.resolve)(url, formattedIssue);
             return link(resolvedUrl, formattedIssue);
@@ -38,7 +38,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
     else {
         let warningKeys;
         if (key) {
-            warningKeys = Array.isArray(key) ? key.map(k => `${k}-123`).join(', ') : key + '-123';
+            warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123';
         }
         else {
             warningKeys = 'ABC-123';
