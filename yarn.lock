@@ -2481,6 +2481,14 @@ cz-conventional-changelog@2.0.0:
     right-pad "^1.0.1"
     word-wrap "^1.0.3"
 
+"danger-plugin-jira-integration@file:":
+  version "0.0.0-development"
+  resolved "file:"
+  dependencies:
+    danger-plugin-jira-integration "file:"
+  optionalDependencies:
+    esdoc "^1.1.0"
+
 danger@*:
   version "11.2.6"
   resolved "https://registry.npmjs.org/danger/-/danger-11.2.6.tgz"

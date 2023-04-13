@@ -1,13 +1,10 @@
 {
   "name": "danger-plugin-jira-integration",
   "description": "Danger plugin to integrate your pull request with JIRA",
-  "author": {
-    "name": "Greg McGrath",
-    "email": "dev@mcgrathg.com"
-  },
+  "author": "Greg McGrath <dev@mcgrathg.com>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mcgrathg/danger-plugin-jira-integration.git"
+    "url": "git+https://github.com/mcgrathg/danger-plugin-jira-integration.git"
   },
   "bugs": {
     "url": "https://github.com/mcgrathg/danger-plugin-jira-integration/issues"
@@ -18,7 +15,7 @@
     "danger-plugin",
     "jira"
   ],
-  "version": "0.0.0-development",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "scripts": {
