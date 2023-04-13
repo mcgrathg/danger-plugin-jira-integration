@@ -1,7 +1,6 @@
 .babelrc
 .editorconfig
 .esdoc.json
-.travis.yml
 yarn.lock
 node_modules/
 src/
