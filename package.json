@@ -1,74 +1,88 @@
 {
-  "name": "danger-plugin-jira-issue",
-  "version": "0.0.0-development",
-  "description": "Danger plugin to link JIRA issue in pull request",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "precommit": "lint-staged",
-    "commitmsg": "validate-commit-msg",
-    "build": "tsc -p tsconfig.json",
-    "lint": "tslint 'src/**/*.ts'",
-    "test": "jest --env=node",
-    "prepublishOnly": "npm run build",
-    "semantic-release": "semantic-release",
-    "travis-deploy-once": "travis-deploy-once"
+  "name": "danger-plugin-jira-integration",
+  "description": "Danger plugin to integrate your pull request with JIRA",
+  "author": {
+    "name": "Greg McGrath",
+    "email": "dev@mcgrathg.com"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/macklinu/danger-plugin-jira-issue.git"
+    "url": "https://github.com/mcgrathg/danger-plugin-jira-integration.git"
   },
+  "bugs": {
+    "url": "https://github.com/mcgrathg/danger-plugin-jira-integration/issues"
+  },
+  "homepage": "https://github.com/mcgrathg/danger-plugin-jira-integration#readme",
   "keywords": [
     "danger",
     "danger-plugin",
     "jira"
   ],
-  "author": "Macklin Underdown <macklinu@gmail.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/macklinu/danger-plugin-jira-issue/issues"
+  "version": "0.0.0-development",
+  "main": "dist/index.js",
+  "types": "types/index.d.ts",
+  "scripts": {
+    "precommit": "lint-staged",
+    "commit": "git-cz",
+    "commitmsg": "validate-commit-msg",
+    "build": "tsc",
+    "test": "jest",
+    "predocs": "rm -rf docs/",
+    "docs": "esdoc -c .esdoc.json",
+    "prepublish": "npm run build",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post",
+    "prettier": "prettier",
+    "prettier-write": "npm run prettier -- --parser typescript --no-semi --trailing-comma es5 --write --print-width 120",
+    "prettier-project": "npm run prettier-write -- 'src/**/*.{ts,tsx}'",
+    "lint": "tslint \"src/**/*.ts\""
   },
-  "homepage": "https://github.com/macklinu/danger-plugin-jira-issue#readme",
+  "license": "MIT",
   "engines": {
-    "node": ">= 4.0.0"
+    "node": ">=4.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.4",
-    "@types/node": "^8.0.6",
-    "husky": "^0.14.1",
-    "jest": "^21.2.1",
-    "lint-staged": "^4.0.0",
-    "prettier": "^1.14.3",
-    "semantic-release": "^15.9.17",
-    "travis-deploy-once": "^5.0.9",
-    "ts-jest": "^21.1.3",
-    "tslint": "^5.11.0",
-    "tslint-config-macklinu": "^1.0.0",
-    "typescript": "^3.1.1",
-    "validate-commit-msg": "^2.12.1"
+    "ts-jest": "^29.1.0",
+    "@types/jest": "^29.5.0",
+    "tslint": "^6.1.3",
+    "danger": "*",
+    "commitizen": "^2.9.6",
+    "cz-conventional-changelog": "^2.0.0",
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^13.2.1",
+    "prettier": "^2.8.7",
+    "semantic-release": "^21.0.1",
+    "typescript": "^5.0.4",
+    "validate-commit-msg": "^2.14.0"
+  },
+  "optionalDependencies": {
+    "esdoc": "^1.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.@(ts|tsx)": [
+      "tslint --fix",
+      "npm run prettier-write --",
+      "git add"
+    ]
   },
   "jest": {
-    "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
       "js"
-    ]
-  },
-  "lint-staged": {
-    "*.ts": [
-      "tslint --fix",
-      "git add"
     ],
-    "*.json": [
-      "prettier --write",
-      "git add"
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testRegex": "(.test)\\.(ts|tsx)$",
+    "testPathIgnorePatterns": [
+      "\\.snap$",
+      "<rootDir>/node_modules/"
     ]
   }
 }

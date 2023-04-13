@@ -67,3 +67,6 @@ dist/
 
 # Generated documentation
 docs/
+
+.DS_Store
+.vscode
