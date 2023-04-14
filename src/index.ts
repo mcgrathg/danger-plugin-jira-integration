@@ -1,5 +1,3 @@
-import { resolve } from 'url'
-
 // Provides dev-time type structures for  `danger` - doesn't affect runtime.
 import { DangerDSLType } from '../node_modules/danger/distribution/dsl/DangerDSL'
 declare var danger: DangerDSLType
@@ -67,8 +65,8 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
     url = ensureUrlEndsWithSlash(url)
     const jiraUrls = Array.from(allIssues).map((issue) => {
       const formattedIssue = issue.toUpperCase()
-      const resolvedUrl = resolve(url, formattedIssue)
-      return link(resolvedUrl, formattedIssue)
+      const resolvedUrl = new URL(formattedIssue, url)
+      return link(resolvedUrl.href, formattedIssue)
     })
     message(format(jiraUrls))
   } else {
