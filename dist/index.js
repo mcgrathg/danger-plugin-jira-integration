@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.jiraIntegration = void 0;
 const url_1 = require("url");
 /**
  * Danger plugin to integrate your pull request with JIRA
@@ -47,6 +48,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
     }
 }
 exports.default = jiraIntegration;
+exports.jiraIntegration = jiraIntegration;
 function link(href, text) {
     return `<a href="${href}">${text}</a>`;
 }
