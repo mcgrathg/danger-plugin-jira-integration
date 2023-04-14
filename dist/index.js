@@ -46,6 +46,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
         }
         warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`);
     }
+    return allIssues;
 }
 exports.default = jiraIntegration;
 exports.jiraIntegration = jiraIntegration;
