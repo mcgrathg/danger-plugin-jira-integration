@@ -92,3 +92,5 @@ function ensureUrlEndsWithSlash(url: string): string {
 }
 
 const defaultFormat = (urls: string[]) => `:link: ${urls.join(', ')}`
+
+export { jiraIntegration }
