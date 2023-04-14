@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.jiraIntegration = void 0;
-const url_1 = require("url");
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
@@ -31,8 +30,8 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
         url = ensureUrlEndsWithSlash(url);
         const jiraUrls = Array.from(allIssues).map((issue) => {
             const formattedIssue = issue.toUpperCase();
-            const resolvedUrl = (0, url_1.resolve)(url, formattedIssue);
-            return link(resolvedUrl, formattedIssue);
+            const resolvedUrl = new URL(formattedIssue, url);
+            return link(resolvedUrl.href, formattedIssue);
         });
         message(format(jiraUrls));
     }
