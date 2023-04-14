@@ -81,6 +81,8 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
 
     warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`)
   }
+
+  return allIssues
 }
 
 function link(href: string, text: string): string {
