@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "strict": true,
+    "target": "es6",
+    "module": "commonjs",
+    "esModuleInterop": true,
     "rootDir": "src",
     "outDir": "dist",
     "allowJs": false,
@@ -10,6 +13,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
+  "lib": ["es2017"],
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
