@@ -29,6 +29,39 @@ export interface Options {
   caseSensitive?: boolean
 }
 
+// valid Jira keys have the following:
+// must be at the beginning of the string (unless it's immediately preceded by a symbol that's not a "-")
+// prefix (area before the hyphen) must start with a letter
+// prefix (area before the hyphen) must be at least 2 characters (letters, numbers, _)
+// issue number (area after the hyphen) must be at least 1 digit and be greater than 0, must be only numbers
+const FALLBACK_REGEXP = '((?<!([\\w]{1,10})-?)[A-Z][A-Z0-9_]+-[1-9]([0-9]*)(?!\\w))'
+
+export const generateRegExp = (options?: Partial<Options>) => {
+  const { key, caseSensitive } = options || {}
+
+  const generatePattern = () => {
+    // Support multiple JIRA projects.
+    const keys = Array.isArray(key) ? `(${key.join('|')})` : key
+
+    return `(${keys}-[1-9]([0-9]*)(?!\\w))`
+  }
+
+  const pattern = key ? generatePattern() : FALLBACK_REGEXP
+
+  return new RegExp(pattern, `g${caseSensitive ? '' : 'i'}`)
+}
+
+export const getWarningMessage = (key?: Options['key']) => {
+  let warningKeys
+  if (key) {
+    warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123'
+  } else {
+    warningKeys = 'ABC-123'
+  }
+
+  return `No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`
+}
+
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
@@ -37,10 +70,7 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
     throw Error(`'url' missing - must supply JIRA installation URL`)
   }
 
-  // Support multiple JIRA projects.
-  const keys = key ? (Array.isArray(key) ? `(${key.join('|')})` : key) : '[A-Za-z]{2,4}'
-
-  const jiraKeyRegex = new RegExp(`(${keys}-[0-9]+)`, `g${caseSensitive ? '' : 'i'}`)
+  const jiraKeyRegex = generateRegExp({ key, caseSensitive })
 
   function findMatches(property: string): string[] {
     const issues: string[] = []
@@ -70,14 +100,7 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
     })
     message(format(jiraUrls))
   } else {
-    let warningKeys
-    if (key) {
-      warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123'
-    } else {
-      warningKeys = 'ABC-123'
-    }
-
-    warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`)
+    warn(getWarningMessage(key))
   }
 
   return allIssues
