@@ -1,6 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jiraIntegration = void 0;
+exports.jiraIntegration = exports.getWarningMessage = exports.generateRegExp = void 0;
+// valid Jira keys have the following:
+// must be at the beginning of the string (unless it's immediately preceded by a symbol that's not a "-")
+// prefix (area before the hyphen) must start with a letter
+// prefix (area before the hyphen) must be at least 2 characters (letters, numbers, _)
+// issue number (area after the hyphen) must be at least 1 digit and be greater than 0, must be only numbers
+const FALLBACK_REGEXP = '((?<!([\\w]{1,10})-?)[A-Z][A-Z0-9_]+-[1-9]([0-9]*)(?!\\w))';
+const generateRegExp = (options) => {
+    const { key, caseSensitive } = options || {};
+    const generatePattern = () => {
+        // Support multiple JIRA projects.
+        const keys = Array.isArray(key) ? `(${key.join('|')})` : key;
+        return `(${keys}-[1-9]([0-9]*)(?!\\w))`;
+    };
+    const pattern = key ? generatePattern() : FALLBACK_REGEXP;
+    return new RegExp(pattern, `g${caseSensitive ? '' : 'i'}`);
+};
+exports.generateRegExp = generateRegExp;
+const getWarningMessage = (key) => {
+    let warningKeys;
+    if (key) {
+        warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123';
+    }
+    else {
+        warningKeys = 'ABC-123';
+    }
+    return `No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`;
+};
+exports.getWarningMessage = getWarningMessage;
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
@@ -8,9 +36,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
     if (!url) {
         throw Error(`'url' missing - must supply JIRA installation URL`);
     }
-    // Support multiple JIRA projects.
-    const keys = key ? (Array.isArray(key) ? `(${key.join('|')})` : key) : '[A-Za-z]{2,4}';
-    const jiraKeyRegex = new RegExp(`(${keys}-[0-9]+)`, `g${caseSensitive ? '' : 'i'}`);
+    const jiraKeyRegex = (0, exports.generateRegExp)({ key, caseSensitive });
     function findMatches(property) {
         const issues = [];
         let match = jiraKeyRegex.exec(property);
@@ -36,14 +62,7 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
         message(format(jiraUrls));
     }
     else {
-        let warningKeys;
-        if (key) {
-            warningKeys = Array.isArray(key) ? key.map((k) => `${k}-123`).join(', ') : key + '-123';
-        }
-        else {
-            warningKeys = 'ABC-123';
-        }
-        warn(`No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`);
+        warn((0, exports.getWarningMessage)(key));
     }
     return allIssues;
 }
