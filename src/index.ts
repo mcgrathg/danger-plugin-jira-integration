@@ -6,15 +6,9 @@ export declare function warn(message: string): void
 export declare function fail(message: string): void
 export declare function markdown(message: string): void
 
-export interface Options {
+interface BaseOptions {
   /** The JIRA instance issue base URL (e.g. https://jira.atlassian.com/browse/). */
   url: string
-
-  /**
-   * The JIRA issue key(s) (e.g. the ABC in ABC-123).
-   * Supports multiple JIRA projects (e.g. `['ABC', 'DEF']`).
-   */
-  key?: string | string[]
 
   /**
    * A format function to format the message
@@ -22,12 +16,27 @@ export interface Options {
    * @returns {string}
    */
   format?: (jiraUrls: string[]) => string
+}
+
+interface OptionsWithoutKey extends BaseOptions {
+  key?: never
+  caseSensitive?: never
+}
+
+interface OptionsWithKey extends BaseOptions {
+  /**
+   * The JIRA issue key(s) (e.g. the ABC in ABC-123).
+   * Supports multiple JIRA projects (e.g. `['ABC', 'DEF']`).
+   */
+  key: string | string[]
 
   /**
    * Whether to match JIRA issue keys case-sensitively.
    */
   caseSensitive?: boolean
 }
+
+export type Options = OptionsWithoutKey | OptionsWithKey
 
 // valid Jira keys have the following:
 // must be at the beginning of the string (unless it's immediately preceded by a symbol that's not a "-")
@@ -43,7 +52,7 @@ export const generateRegExp = (options?: Partial<Options>) => {
     // Support multiple JIRA projects.
     const keys = Array.isArray(key) ? `(${key.join('|')})` : key
 
-    return `(${keys}-[1-9]([0-9]*)(?!\\w))`
+    return `((?<!([\\w]{1,10})-?)${keys}-[1-9]([0-9]*)(?!\\w))`
   }
 
   const pattern = key ? generatePattern() : FALLBACK_REGEXP
@@ -62,6 +71,16 @@ export const getWarningMessage = (key?: Options['key']) => {
   return `No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`
 }
 
+function isValidUrl(str: string) {
+  try {
+    const url = new URL(str)
+    // Check if the protocol is http: or https:
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch (_) {
+    return false
+  }
+}
+
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
@@ -72,13 +91,33 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
 
   const jiraKeyRegex = generateRegExp({ key, caseSensitive })
 
-  function findMatches(property: string): string[] {
+  function findMatches(text: string): string[] {
     const issues: string[] = []
 
-    let match = jiraKeyRegex.exec(property)
-    while (match !== null) {
-      issues.push(match[0].toLowerCase())
-      match = jiraKeyRegex.exec(property)
+    if (text) {
+      // split on whitespace, then iterate over each word
+      text.split(/\s+/).forEach((word) => {
+        // if link, then remove the URL portion, we only want to test the user-entered text
+        // example: [test](http://example.com) -> [test]
+        if (word.includes('](')) {
+          word = word.split('](')[0].replace('[', '')
+        }
+
+        let match = jiraKeyRegex.exec(word)
+        while (match !== null) {
+          if (isValidUrl(word)) {
+            // confirm that the URL in `word` is similar to our Jira URL
+            if (!word.startsWith(url)) {
+              // remove non-Jira-related URLs from our search
+              // the Jira key can't be found in some random URL
+              return
+            }
+          }
+
+          issues.push(match[0].toUpperCase())
+          match = jiraKeyRegex.exec(word)
+        }
+      })
     }
 
     return issues
@@ -93,6 +132,7 @@ export default function jiraIntegration({ key, url, format = defaultFormat, case
   if (allIssues.size > 0) {
     // URL must end with a slash before attempting to fully resolve the JIRA URL.
     url = ensureUrlEndsWithSlash(url)
+
     const jiraUrls = Array.from(allIssues).map((issue) => {
       const formattedIssue = issue.toUpperCase()
       const resolvedUrl = new URL(formattedIssue, url)
