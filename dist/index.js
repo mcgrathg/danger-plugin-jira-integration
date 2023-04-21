@@ -12,7 +12,7 @@ const generateRegExp = (options) => {
     const generatePattern = () => {
         // Support multiple JIRA projects.
         const keys = Array.isArray(key) ? `(${key.join('|')})` : key;
-        return `(${keys}-[1-9]([0-9]*)(?!\\w))`;
+        return `((?<!([\\w]{1,10})-?)${keys}-[1-9]([0-9]*)(?!\\w))`;
     };
     const pattern = key ? generatePattern() : FALLBACK_REGEXP;
     return new RegExp(pattern, `g${caseSensitive ? '' : 'i'}`);
@@ -29,6 +29,16 @@ const getWarningMessage = (key) => {
     return `No JIRA keys found in the PR title, branch name, or commit messages (e.g. ${warningKeys}).`;
 };
 exports.getWarningMessage = getWarningMessage;
+function isValidUrl(str) {
+    try {
+        const url = new URL(str);
+        // Check if the protocol is http: or https:
+        return url.protocol === 'http:' || url.protocol === 'https:';
+    }
+    catch (_) {
+        return false;
+    }
+}
 /**
  * Danger plugin to integrate your pull request with JIRA
  */
@@ -37,12 +47,30 @@ function jiraIntegration({ key, url, format = defaultFormat, caseSensitive = fal
         throw Error(`'url' missing - must supply JIRA installation URL`);
     }
     const jiraKeyRegex = (0, exports.generateRegExp)({ key, caseSensitive });
-    function findMatches(property) {
+    function findMatches(text) {
         const issues = [];
-        let match = jiraKeyRegex.exec(property);
-        while (match !== null) {
-            issues.push(match[0].toLowerCase());
-            match = jiraKeyRegex.exec(property);
+        if (text) {
+            // split on whitespace, then iterate over each word
+            text.split(/\s+/).forEach((word) => {
+                // if link, then remove the URL portion, we only want to test the user-entered text
+                // example: [test](http://example.com) -> [test]
+                if (word.includes('](')) {
+                    word = word.split('](')[0].replace('[', '');
+                }
+                let match = jiraKeyRegex.exec(word);
+                while (match !== null) {
+                    if (isValidUrl(word)) {
+                        // confirm that the URL in `word` is similar to our Jira URL
+                        if (!word.startsWith(url)) {
+                            // remove non-Jira-related URLs from our search
+                            // the Jira key can't be found in some random URL
+                            return;
+                        }
+                    }
+                    issues.push(match[0].toUpperCase());
+                    match = jiraKeyRegex.exec(word);
+                }
+            });
         }
         return issues;
     }
