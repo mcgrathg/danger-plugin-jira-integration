@@ -1,6 +1,5 @@
 .babelrc
 .editorconfig
-.esdoc.json
 yarn.lock
 node_modules/
 src/
